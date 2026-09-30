@@ -1,0 +1,3157 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="wood">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Suika Drop" />
+  <meta name="theme-color" content="#fff6e5" id="themeColorMeta" />
+  <link id="appleTouchIcon" rel="apple-touch-icon" />
+  <title>Suika Drop — Juicy Fruit Merge Game</title>
+  <style>
+    :root {
+      /* Cozy Wood Kitchen (Default) */
+      --bg-grad-1: #fff6e5;
+      --bg-grad-2: #fde2b8;
+      --bg-pattern: rgba(217, 148, 78, 0.07);
+      --panel-bg: rgba(255, 250, 240, 0.88);
+      --panel-border: #e3c193;
+      --panel-shadow: 0 10px 28px rgba(120, 72, 24, 0.12);
+      --box-bg: rgba(255, 248, 234, 0.82);
+      --box-wall: #b57c43;
+      --box-wall-Highlight: #d69f66;
+      --box-wall-dark: #875627;
+      --text-main: #4a2e14;
+      --text-muted: #8c6540;
+      --accent: #ff6b35;
+      --accent-hover: #e85520;
+      --accent-soft: #ffe4d6;
+      --secondary: #4ea8de;
+      --danger: #e63946;
+      --gold: #f4a261;
+      --card-inner: rgba(243, 224, 195, 0.55);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --font-sans: 'Rounded Mplus 1c', 'Nunito', 'Quicksand', 'SF Pro Rounded', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    [data-theme="picnic"] {
+      --bg-grad-1: #fff0f5;
+      --bg-grad-2: #ffd6e7;
+      --bg-pattern: rgba(255, 105, 180, 0.07);
+      --panel-bg: rgba(255, 252, 254, 0.9);
+      --panel-border: #f7b2ce;
+      --panel-shadow: 0 10px 28px rgba(180, 60, 110, 0.13);
+      --box-bg: rgba(255, 247, 251, 0.84);
+      --box-wall: #e57fa6;
+      --box-wall-Highlight: #f7a6c4;
+      --box-wall-dark: #b8547b;
+      --text-main: #4a1c30;
+      --text-muted: #94526e;
+      --accent: #ff477e;
+      --accent-hover: #e03168;
+      --accent-soft: #ffe0ea;
+      --secondary: #52b788;
+      --danger: #e63946;
+      --gold: #ffb703;
+      --card-inner: rgba(252, 222, 235, 0.6);
+    }
+
+    [data-theme="neon"] {
+      --bg-grad-1: #0f0c24;
+      --bg-grad-2: #1c1642;
+      --bg-pattern: rgba(0, 245, 212, 0.05);
+      --panel-bg: rgba(28, 25, 58, 0.86);
+      --panel-border: #3d348b;
+      --panel-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+      --box-bg: rgba(18, 16, 40, 0.85);
+      --box-wall: #7209b7;
+      --box-wall-Highlight: #b5179e;
+      --box-wall-dark: #3a0ca3;
+      --text-main: #f1f0ff;
+      --text-muted: #a09cc9;
+      --accent: #f72585;
+      --accent-hover: #d91670;
+      --accent-soft: rgba(247, 37, 133, 0.2);
+      --secondary: #00f5d4;
+      --danger: #ff3366;
+      --gold: #fee440;
+      --card-inner: rgba(45, 38, 92, 0.65);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+      touch-action: manipulation;
+      font-family: var(--font-sans);
+      color: var(--text-main);
+      background: radial-gradient(circle at 50% 20%, var(--bg-grad-1), var(--bg-grad-2));
+      transition: background 0.35s ease, color 0.25s ease;
+    }
+
+    /* Subtle polka/checker background texture */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(var(--bg-pattern) 2px, transparent 2px),
+        radial-gradient(var(--bg-pattern) 2px, transparent 2px);
+      background-size: 36px 36px;
+      background-position: 0 0, 18px 18px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100dvh;
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      padding:
+        max(10px, env(safe-area-inset-top))
+        max(16px, env(safe-area-inset-right))
+        max(10px, env(safe-area-inset-bottom))
+        max(16px, env(safe-area-inset-left));
+      gap: 8px;
+    }
+
+    /* Top Header Bar */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 16px;
+      background: var(--panel-bg);
+      border: 2px solid var(--panel-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--panel-shadow);
+      backdrop-filter: blur(10px);
+      flex-shrink: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2ec4b6, #208b3a);
+      border: 2px solid #145a23;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    }
+
+    .brand-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mode-pill {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid currentColor;
+      cursor: pointer;
+      transition: transform 0.15s ease, background 0.2s ease;
+    }
+
+    .mode-pill:hover {
+      transform: scale(1.04);
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 11px;
+      border-radius: 12px;
+      border: 2px solid var(--panel-border);
+      background: var(--card-inner);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .icon-btn:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent);
+    }
+
+    .icon-btn:active {
+      transform: translateY(1px);
+    }
+
+    .icon-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .icon-btn.muted {
+      opacity: 0.55;
+    }
+
+    /* Main 3-Column Game Stage */
+    .stage {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 250px minmax(280px, 460px) 250px;
+      justify-content: center;
+      align-items: stretch;
+      gap: 16px;
+    }
+
+    .side-column {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .card {
+      background: var(--panel-bg);
+      border: 2px solid var(--panel-border);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      box-shadow: var(--panel-shadow);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card-title {
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Score Card */
+    .score-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .score-box {
+      background: var(--card-inner);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      text-align: center;
+      border: 1px solid var(--panel-border);
+    }
+
+    .score-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .score-value {
+      font-size: 1.55rem;
+      font-weight: 900;
+      line-height: 1.15;
+      margin-top: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .score-value.highlight {
+      color: var(--accent);
+    }
+
+    .combo-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: var(--card-inner);
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    .combo-bar-wrap {
+      flex: 1;
+      height: 7px;
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 99px;
+      margin-left: 10px;
+      overflow: hidden;
+    }
+
+    .combo-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--gold), var(--accent));
+      border-radius: 99px;
+      transition: width 0.08s linear;
+    }
+
+    /* Hold & Next Fruit Preview Slots */
+    .queue-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .slot-box {
+      background: var(--card-inner);
+      border: 2px solid var(--panel-border);
+      border-radius: var(--radius-md);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      position: relative;
+      transition: all 0.18s ease;
+    }
+
+    .slot-box.interactive {
+      cursor: pointer;
+    }
+
+    .slot-box.interactive:hover:not(.disabled) {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .slot-box.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .slot-canvas {
+      width: 68px;
+      height: 68px;
+      display: block;
+    }
+
+    .slot-name {
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .slot-hint {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 6px;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    /* Tactical Abilities */
+    .abilities-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .ability-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--panel-border);
+      background: var(--card-inner);
+      color: var(--text-main);
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.16s ease;
+      text-align: left;
+    }
+
+    .ability-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .ability-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .ability-btn.targeting {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      animation: pulse-ring 1.1s infinite;
+    }
+
+    @keyframes pulse-ring {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.5); }
+      50% { box-shadow: 0 0 0 6px rgba(255, 107, 53, 0); }
+    }
+
+    .ability-info {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .ability-icon {
+      font-size: 1.25rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: var(--panel-bg);
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--panel-border);
+    }
+
+    .ability-name {
+      font-size: 0.84rem;
+      font-weight: 800;
+      display: block;
+    }
+
+    .ability-desc {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      display: block;
+    }
+
+    .ability-btn.targeting .ability-desc {
+      color: rgba(255,255,255,0.9);
+    }
+
+    .charge-pips {
+      display: flex;
+      gap: 4px;
+    }
+
+    .pip {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--panel-border);
+    }
+
+    .pip.filled {
+      background: var(--accent);
+      border-color: var(--accent-hover);
+      box-shadow: 0 0 6px var(--accent);
+    }
+
+    .milestone-progress {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 2px;
+    }
+
+    /* Center Game Canvas Area */
+    .center-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+      position: relative;
+    }
+
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #gameCanvas {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 18px;
+      cursor: crosshair;
+      touch-action: none;
+      filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.18));
+    }
+
+    /* Evolution Wheel / Guide Card */
+    .evo-card {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .evo-wheel-wrap {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    #evoCanvas {
+      width: 100%;
+      max-width: 220px;
+      aspect-ratio: 1 / 1;
+      display: block;
+    }
+
+    .controls-legend {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      background: var(--card-inner);
+      padding: 9px 11px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--panel-border);
+    }
+
+    .controls-legend kbd {
+      display: inline-block;
+      padding: 1px 5px;
+      font-size: 0.68rem;
+      font-family: inherit;
+      font-weight: 800;
+      border-radius: 5px;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      color: var(--text-main);
+    }
+
+    /* Modals (<dialog>) */
+    dialog.game-modal {
+      margin: auto;
+      border: 3px solid var(--panel-border);
+      border-radius: 24px;
+      background: var(--panel-bg);
+      color: var(--text-main);
+      padding: 24px;
+      max-width: 440px;
+      width: calc(100% - 32px);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(16px);
+    }
+
+    dialog.game-modal::backdrop {
+      background: rgba(15, 10, 25, 0.55);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .modal-title {
+      font-size: 1.4rem;
+      font-weight: 900;
+    }
+
+    .modal-body {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat-item {
+      background: var(--card-inner);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      text-align: center;
+    }
+
+    .stat-item .val {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: var(--accent);
+    }
+
+    .stat-item .lbl {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .primary-btn {
+      width: 100%;
+      padding: 12px 18px;
+      border-radius: 14px;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(255, 107, 53, 0.35);
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+
+    .primary-btn:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    /* Mobile / Compact Responsive Layout */
+    @media (max-width: 880px) {
+      .app-shell {
+        padding:
+          max(6px, env(safe-area-inset-top))
+          max(8px, env(safe-area-inset-right))
+          max(8px, env(safe-area-inset-bottom))
+          max(8px, env(safe-area-inset-left));
+        gap: 5px;
+      }
+
+      .top-bar {
+        padding: 5px 8px;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .brand-logo {
+        width: 26px;
+        height: 26px;
+        font-size: 14px;
+      }
+
+      .brand-title {
+        font-size: 0.95rem;
+        gap: 5px;
+      }
+
+      .mode-pill {
+        font-size: 0.62rem;
+        padding: 2px 6px;
+      }
+
+      .header-controls {
+        gap: 4px;
+      }
+
+      .icon-btn {
+        padding: 4px 7px;
+        font-size: 0.7rem;
+        border-radius: 9px;
+      }
+
+      .stage {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+        gap: 5px;
+      }
+
+      .side-column.left-col {
+        flex-direction: row;
+        align-items: stretch;
+        gap: 5px;
+      }
+
+      .side-column.left-col .card {
+        flex: 1;
+        padding: 6px 8px;
+        gap: 4px;
+      }
+
+      .card-title {
+        font-size: 0.62rem;
+      }
+
+      .score-box {
+        padding: 5px;
+      }
+
+      .score-value {
+        font-size: 1.05rem;
+      }
+
+      .slot-box {
+        padding: 4px;
+      }
+
+      .slot-canvas {
+        width: 36px;
+        height: 36px;
+      }
+
+      .slot-hint {
+        display: none;
+      }
+
+      .side-column.right-col {
+        flex-direction: row;
+        gap: 5px;
+      }
+
+      .side-column.right-col .evo-card,
+      .side-column.right-col .controls-card {
+        display: none;
+      }
+
+      .side-column.right-col .abilities-card {
+        flex: 1;
+        padding: 6px 8px;
+        gap: 4px;
+      }
+
+      .abilities-list {
+        flex-direction: row;
+      }
+
+      .ability-btn {
+        padding: 6px 8px;
+      }
+
+      .ability-desc {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">🍉</div>
+        <div class="brand-title">
+          <span>Suika Drop</span>
+          <button id="modeToggleBtn" class="mode-pill" title="Click to switch between Enhanced & Pure Classic mode">
+            Enhanced Mode
+          </button>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <button id="themeBtn" class="icon-btn" title="Switch Visual Theme">
+          <span>🎨</span> <span id="themeLabel">Cozy Wood</span>
+        </button>
+        <button id="musicBtn" class="icon-btn" title="Toggle Cozy Marimba Music">
+          <span>🎵</span> <span id="musicLabel">Music Off</span>
+        </button>
+        <button id="sfxBtn" class="icon-btn active" title="Toggle Sound Effects">
+          <span>🔊</span> <span id="sfxLabel">SFX On</span>
+        </button>
+        <button id="statsBtn" class="icon-btn" title="View Lifetime Statistics">
+          <span>🏆</span> <span>Stats</span>
+        </button>
+        <button id="restartBtn" class="icon-btn" title="Start a Fresh Game">
+          <span>🔄</span> <span>New Game</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main 3-Column Stage -->
+    <main class="stage">
+      <!-- Left Column: Score + Hold & Next Queue -->
+      <section class="side-column left-col">
+        <div class="card">
+          <div class="card-title">
+            <span>Scoreboard</span>
+            <span id="highScoreModeTag">Enhanced Best</span>
+          </div>
+          <div class="score-grid">
+            <div class="score-box">
+              <div class="score-label">Score</div>
+              <div id="scoreVal" class="score-value highlight">0</div>
+            </div>
+            <div class="score-box">
+              <div class="score-label">Best</div>
+              <div id="bestVal" class="score-value">0</div>
+            </div>
+          </div>
+          <div class="combo-banner">
+            <span id="comboText">Combo 1x</span>
+            <div class="combo-bar-wrap">
+              <div id="comboBar" class="combo-bar-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span>Fruit Queue</span>
+            <span id="swapStatusHint">Hold Ready</span>
+          </div>
+          <div class="queue-row">
+            <div id="holdSlotBox" class="slot-box interactive" title="Swap current fruit with Hold slot (Key: C / Shift / Right-Click)">
+              <div class="score-label">Hold / Swap</div>
+              <canvas id="holdCanvas" class="slot-canvas" width="136" height="136"></canvas>
+              <div id="holdFruitName" class="slot-name">Empty</div>
+              <div class="slot-hint">Press C / R-Click</div>
+            </div>
+            <div class="slot-box">
+              <div class="score-label">Next Up</div>
+              <canvas id="nextCanvas" class="slot-canvas" width="136" height="136"></canvas>
+              <div id="nextFruitName" class="slot-name">Cherry</div>
+              <div class="slot-hint">Preview</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Center Column: Physics Container Canvas -->
+      <section class="center-stage">
+        <div class="canvas-wrapper">
+          <canvas id="gameCanvas" width="440" height="620"></canvas>
+        </div>
+      </section>
+
+      <!-- Right Column: Tactical Abilities + Evolution Wheel + Controls -->
+      <section class="side-column right-col">
+        <div id="abilitiesCard" class="card abilities-card">
+          <div class="card-title">
+            <span>Tactical Tools</span>
+            <span id="milestoneHint">Next +1 at 1,000 pts</span>
+          </div>
+          <div class="abilities-list">
+            <button id="shakeBtn" class="ability-btn" title="Jolt the box to nudge stuck fruits into merging (Key: 1)">
+              <div class="ability-info">
+                <div class="ability-icon">🫨</div>
+                <div>
+                  <span class="ability-name">Shake Box <kbd>1</kbd></span>
+                  <span class="ability-desc">Jostle fruits to spark merges</span>
+                </div>
+              </div>
+              <div id="shakePips" class="charge-pips"></div>
+            </button>
+
+            <button id="forkBtn" class="ability-btn" title="Click any fruit in the box to pop & remove it (Key: 2)">
+              <div class="ability-info">
+                <div class="ability-icon">🍴</div>
+                <div>
+                  <span id="forkBtnTitle" class="ability-name">Fork Pop <kbd>2</kbd></span>
+                  <span id="forkBtnDesc" class="ability-desc">Click a blocking fruit to remove</span>
+                </div>
+              </div>
+              <div id="forkPips" class="charge-pips"></div>
+            </button>
+          </div>
+        </div>
+
+        <div class="card evo-card">
+          <div class="card-title">
+            <span>Evolution Ring</span>
+            <span id="discoveredCount">1 / 11 Found</span>
+          </div>
+          <div class="evo-wheel-wrap">
+            <canvas id="evoCanvas" width="440" height="440"></canvas>
+          </div>
+        </div>
+
+        <div class="card controls-card">
+          <div class="controls-legend">
+            <strong>Controls:</strong> Move with <strong>Mouse / Touch</strong> or <kbd>A</kbd><kbd>D</kbd> / <kbd>←</kbd><kbd>→</kbd>.
+            Drop with <strong>Click / Release</strong> or <kbd>Space</kbd>.
+            Hold/Swap with <kbd>C</kbd> or <strong>Right-Click</strong>.
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Game Over Modal -->
+  <dialog id="gameOverModal" class="game-modal">
+    <div class="modal-header">
+      <h2 class="modal-title">🍉 Box Overflowed!</h2>
+    </div>
+    <div class="modal-body">
+      <p id="gameOverSubtext" style="color: var(--text-muted); font-weight: 600;">
+        Your fruits stacked past the top line! Here is how your run went:
+      </p>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div id="goScore" class="val">0</div>
+          <div class="lbl">Final Score</div>
+        </div>
+        <div class="stat-item">
+          <div id="goBest" class="val">0</div>
+          <div class="lbl">Best Score</div>
+        </div>
+        <div class="stat-item">
+          <div id="goCombo" class="val">1x</div>
+          <div class="lbl">Max Combo</div>
+        </div>
+        <div class="stat-item">
+          <div id="goLargest" class="val">Cherry</div>
+          <div class="lbl">Biggest Fruit</div>
+        </div>
+      </div>
+      <button id="playAgainBtn" class="primary-btn">Play Again</button>
+    </div>
+  </dialog>
+
+  <!-- Lifetime Stats Modal -->
+  <dialog id="statsModal" class="game-modal">
+    <div class="modal-header">
+      <h2 class="modal-title">🏆 Lifetime Stats</h2>
+      <button id="closeStatsBtn" class="icon-btn">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div id="stEnhancedBest" class="val">0</div>
+          <div class="lbl">Enhanced Best</div>
+        </div>
+        <div class="stat-item">
+          <div id="stClassicBest" class="val">0</div>
+          <div class="lbl">Classic Best</div>
+        </div>
+        <div class="stat-item">
+          <div id="stGames" class="val">0</div>
+          <div class="lbl">Games Played</div>
+        </div>
+        <div class="stat-item">
+          <div id="stMerges" class="val">0</div>
+          <div class="lbl">Total Merges</div>
+        </div>
+        <div class="stat-item">
+          <div id="stWatermelons" class="val">0</div>
+          <div class="lbl">Watermelons Made</div>
+        </div>
+        <div class="stat-item">
+          <div id="stDoubleSuika" class="val">0</div>
+          <div class="lbl">Double Suika Clears</div>
+        </div>
+      </div>
+      <button id="closeStatsPrimaryBtn" class="primary-btn">Back to Game</button>
+    </div>
+  </dialog>
+
+  <script>
+    (() => {
+      'use strict';
+
+      /* =========================================================================
+       * 1. FRUIT TIER DEFINITIONS (11 Classic Suika Tiers)
+       * ========================================================================= */
+      const FRUITS = [
+        { tier: 0,  name: 'Cherry',     radius: 16,  score: 1,  mass: 1.0,  color1: '#ff3355', color2: '#b80028', rim: '#7a001a', freq: 523.25 },
+        { tier: 1,  name: 'Strawberry', radius: 23,  score: 3,  mass: 1.8,  color1: '#ff5c77', color2: '#e01e45', rim: '#990f2b', freq: 587.33 },
+        { tier: 2,  name: 'Grape',      radius: 31,  score: 6,  mass: 3.0,  color1: '#a663cc', color2: '#6f2dbd', rim: '#48168a', freq: 659.25 },
+        { tier: 3,  name: 'Tangerine',  radius: 39,  score: 10, mass: 4.8,  color1: '#ffb703', color2: '#fb8500', rim: '#b85d00', freq: 698.46 },
+        { tier: 4,  name: 'Persimmon',  radius: 48,  score: 15, mass: 7.5,  color1: '#ff7b29', color2: '#d94e0f', rim: '#8f2d00', freq: 783.99 },
+        { tier: 5,  name: 'Apple',      radius: 58,  score: 21, mass: 11.5, color1: '#ff4747', color2: '#c9182b', rim: '#780916', freq: 880.00 },
+        { tier: 6,  name: 'Pear',       radius: 68,  score: 28, mass: 16.5, color1: '#d9ed42', color2: '#9bc53d', rim: '#5f7d1e', freq: 987.77 },
+        { tier: 7,  name: 'Peach',      radius: 79,  score: 36, mass: 23.0, color1: '#ffb3c6', color2: '#ff758f', rim: '#c94262', freq: 1046.50 },
+        { tier: 8,  name: 'Pineapple',  radius: 91,  score: 45, mass: 32.0, color1: '#ffe135', color2: '#f4a222', rim: '#a36200', freq: 1174.66 },
+        { tier: 9,  name: 'Melon',      radius: 105, score: 55, mass: 44.0, color1: '#a8e6a3', color2: '#5bbd68', rim: '#2f7a3a', freq: 1318.51 },
+        { tier: 10, name: 'Watermelon', radius: 122, score: 66, mass: 60.0, color1: '#38b000', color2: '#1b7a00', rim: '#0d4700', freq: 1567.98 }
+      ];
+
+      const THEMES = [
+        { id: 'wood',   name: 'Cozy Wood' },
+        { id: 'picnic', name: 'Pastel Picnic' },
+        { id: 'neon',   name: 'Midnight Neon' }
+      ];
+
+      const STORAGE_KEY_STATE = 'suika_drop_active_state_v1';
+      const STORAGE_KEY_META  = 'suika_drop_meta_v1';
+
+      /* =========================================================================
+       * 2. PROCEDURAL WEB AUDIO ENGINE (SFX + Cozy Marimba Loop)
+       * ========================================================================= */
+      class SoundEngine {
+        constructor() {
+          this.ctx = null;
+          this.sfxEnabled = true;
+          this.musicEnabled = false;
+          this.musicTimer = null;
+          this.musicStep = 0;
+        }
+
+        init() {
+          if (!this.ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) this.ctx = new AudioCtx();
+          }
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume();
+          }
+        }
+
+        playDrop() {
+          if (!this.sfxEnabled) return;
+          this.init();
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(320, now);
+          osc.frequency.exponentialRampToValueAtTime(150, now + 0.09);
+          gain.gain.setValueAtTime(0.16, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.095);
+        }
+
+        playThud(intensity = 0.5) {
+          if (!this.sfxEnabled) return;
+          this.init();
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(125, now);
+          osc.frequency.exponentialRampToValueAtTime(52, now + 0.06);
+          const vol = Math.min(0.14, Math.max(0.02, intensity * 0.12));
+          gain.gain.setValueAtTime(vol, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.065);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.07);
+        }
+
+        playMerge(tier, combo = 1) {
+          if (!this.sfxEnabled) return;
+          this.init();
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+          const baseFreq = FRUITS[Math.min(tier, FRUITS.length - 1)].freq;
+          const comboMultiplier = Math.pow(1.04, Math.min(combo - 1, 8));
+          const freq = baseFreq * comboMultiplier;
+
+          // Juicy bubble pop fundamental
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq * 0.65, now);
+          osc.frequency.exponentialRampToValueAtTime(freq * 1.18, now + 0.07);
+          osc.frequency.exponentialRampToValueAtTime(freq, now + 0.16);
+
+          gain.gain.setValueAtTime(0.24, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.23);
+
+          // Harmonic sparkle for higher tiers or combos
+          if (tier >= 4 || combo >= 2) {
+            const osc2 = this.ctx.createOscillator();
+            const gain2 = this.ctx.createGain();
+            osc2.type = 'triangle';
+            osc2.frequency.setValueAtTime(freq * 1.5, now + 0.04);
+            osc2.frequency.exponentialRampToValueAtTime(freq * 2.0, now + 0.22);
+            gain2.gain.setValueAtTime(0.12, now + 0.04);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
+            osc2.connect(gain2);
+            gain2.connect(this.ctx.destination);
+            osc2.start(now + 0.04);
+            osc2.stop(now + 0.25);
+          }
+        }
+
+        playDoubleWatermelon() {
+          if (!this.sfxEnabled) return;
+          this.init();
+          if (!this.ctx) return;
+          const notes = [523.25, 659.25, 783.99, 1046.5, 1318.51, 1567.98, 2093.0];
+          notes.forEach((f, idx) => {
+            const now = this.ctx.currentTime + idx * 0.065;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(f, now);
+            gain.gain.setValueAtTime(0.22, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.4);
+          });
+        }
+
+        playSwap() {
+          if (!this.sfxEnabled) return;
+          this.init();
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(380, now);
+          osc.frequency.exponentialRampToValueAtTime(580, now + 0.08);
+          gain.gain.setValueAtTime(0.14, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.095);
+        }
+
+        playShake() {
+          if (!this.sfxEnabled) return;
+          this.init();
+          if (!this.ctx) return;
+          for (let i = 0; i < 4; i++) {
+            const now = this.ctx.currentTime + i * 0.055;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(110 + i * 35, now);
+            osc.frequency.exponentialRampToValueAtTime(70, now + 0.05);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.055);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.06);
+          }
+        }
+
+        playForkPop() {
+          if (!this.sfxEnabled) return;
+          this.init();
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(740, now);
+          osc.frequency.exponentialRampToValueAtTime(220, now + 0.14);
+          gain.gain.setValueAtTime(0.22, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.16);
+        }
+
+        playDangerBeep() {
+          if (!this.sfxEnabled) return;
+          this.init();
+          if (!this.ctx) return;
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(880, now);
+          gain.gain.setValueAtTime(0.05, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.075);
+        }
+
+        toggleMusic(forceState) {
+          this.musicEnabled = forceState !== undefined ? forceState : !this.musicEnabled;
+          if (this.musicEnabled) {
+            this.init();
+            this.startMusicLoop();
+          } else {
+            this.stopMusicLoop();
+          }
+          return this.musicEnabled;
+        }
+
+        startMusicLoop() {
+          this.stopMusicLoop();
+          // Cozy C-major pentatonic kalimba/marimba pattern
+          const melody = [
+            523.25, 659.25, 783.99, 880.00,
+            783.99, 659.25, 587.33, 523.25,
+            440.00, 523.25, 659.25, 783.99,
+            659.25, 587.33, 523.25, 392.00
+          ];
+          const bass = [261.63, 220.00, 174.61, 196.00];
+
+          this.musicTimer = setInterval(() => {
+            if (!this.musicEnabled || !this.ctx || document.hidden) return;
+            const now = this.ctx.currentTime;
+            const note = melody[this.musicStep % melody.length];
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(note, now);
+            gain.gain.setValueAtTime(0.045, now);
+            gain.gain.exponentialRampToValueAtTime(0.0008, now + 0.36);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.38);
+
+            // Soft warm bass note every 4 steps
+            if (this.musicStep % 4 === 0) {
+              const bNote = bass[(this.musicStep / 4) % bass.length];
+              const bOsc = this.ctx.createOscillator();
+              const bGain = this.ctx.createGain();
+              bOsc.type = 'triangle';
+              bOsc.frequency.setValueAtTime(bNote, now);
+              bGain.gain.setValueAtTime(0.035, now);
+              bGain.gain.exponentialRampToValueAtTime(0.0008, now + 0.9);
+              bOsc.connect(bGain);
+              bGain.connect(this.ctx.destination);
+              bOsc.start(now);
+              bOsc.stop(now + 0.95);
+            }
+            this.musicStep++;
+          }, 340);
+        }
+
+        stopMusicLoop() {
+          if (this.musicTimer) {
+            clearInterval(this.musicTimer);
+            this.musicTimer = null;
+          }
+        }
+      }
+
+      const sound = new SoundEngine();
+
+      /* =========================================================================
+       * 3. KAWAII ILLUSTRATED FRUIT RENDERER (Canvas 2D)
+       * ========================================================================= */
+      function drawFruitIllustration(ctx, tier, x, y, radius, angle = 0, scaleX = 1, scaleY = 1, isTargeted = false) {
+        const spec = FRUITS[tier];
+        if (!spec) return;
+
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        ctx.scale(scaleX, scaleY);
+
+        const r = radius;
+
+        // 1. Top stems / leaves / crowns (drawn behind or integrated with body)
+        drawFruitCrown(ctx, tier, r);
+
+        // 2. Main Fruit Sphere / Silhouette with Radial Gradient
+        const grad = ctx.createRadialGradient(-r * 0.28, -r * 0.28, r * 0.1, 0, 0, r);
+        grad.addColorStop(0, spec.color1);
+        grad.addColorStop(0.85, spec.color2);
+        grad.addColorStop(1, spec.rim);
+
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Crisp outer rim
+        ctx.lineWidth = Math.max(2, r * 0.055);
+        ctx.strokeStyle = spec.rim;
+        ctx.stroke();
+
+        // 3. Fruit-specific surface patterns (clipped inside circle)
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(0, 0, r * 0.97, 0, Math.PI * 2);
+        ctx.clip();
+        drawFruitSurfaceDetails(ctx, tier, r);
+        ctx.restore();
+
+        // 4. Glossy specular highlight
+        ctx.save();
+        ctx.translate(-r * 0.34, -r * 0.34);
+        ctx.rotate(-Math.PI / 4);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.42)';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, r * 0.24, r * 0.12, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(-r * 0.2, r * 0.06, r * 0.055, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // 5. Expressive Kawaii Face
+        drawKawaiiFace(ctx, tier, r);
+
+        // 6. Fork Pop Target Reticle Overlay
+        if (isTargeted) {
+          ctx.strokeStyle = '#ff2a55';
+          ctx.lineWidth = 3;
+          ctx.setLineDash([6, 4]);
+          ctx.beginPath();
+          ctx.arc(0, 0, r + 5, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+
+        ctx.restore();
+      }
+
+      function drawFruitCrown(ctx, tier, r) {
+        ctx.save();
+        switch (tier) {
+          case 0: // Cherry stem
+            ctx.strokeStyle = '#4a7c2c';
+            ctx.lineWidth = Math.max(2, r * 0.14);
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(0, -r * 0.85);
+            ctx.quadraticCurveTo(r * 0.35, -r * 1.45, r * 0.55, -r * 1.55);
+            ctx.stroke();
+            // Little green leaf
+            ctx.fillStyle = '#6ab04c';
+            ctx.beginPath();
+            ctx.ellipse(r * 0.25, -r * 1.3, r * 0.28, r * 0.13, -0.4, 0, Math.PI * 2);
+            ctx.fill();
+            break;
+
+          case 2: // Grape curly vine
+            ctx.strokeStyle = '#5c9433';
+            ctx.lineWidth = 2.2;
+            ctx.beginPath();
+            ctx.moveTo(0, -r * 0.9);
+            ctx.bezierCurveTo(-r * 0.3, -r * 1.35, r * 0.35, -r * 1.4, r * 0.15, -r * 1.1);
+            ctx.stroke();
+            break;
+
+          case 3: // Dekopon top bump
+            ctx.fillStyle = '#fb8500';
+            ctx.strokeStyle = '#b85d00';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, -r * 0.86, r * 0.26, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = '#52b788';
+            ctx.beginPath();
+            ctx.ellipse(r * 0.22, -r * 1.05, r * 0.22, r * 0.09, -0.35, 0, Math.PI * 2);
+            ctx.fill();
+            break;
+
+          case 5: // Apple stem + leaf
+          case 6: // Pear stem
+            ctx.strokeStyle = '#6f4518';
+            ctx.lineWidth = Math.max(3, r * 0.07);
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(0, -r * 0.88);
+            ctx.lineTo(r * 0.08, -r * 1.16);
+            ctx.stroke();
+            ctx.fillStyle = '#52b788';
+            ctx.beginPath();
+            ctx.ellipse(r * 0.24, -r * 1.05, r * 0.2, r * 0.09, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+            break;
+
+          case 8: // Pineapple spiky leaf crown
+            ctx.fillStyle = '#2b9348';
+            ctx.strokeStyle = '#19592b';
+            ctx.lineWidth = 2;
+            const spikes = [-0.42, -0.2, 0, 0.2, 0.42];
+            spikes.forEach((rot, idx) => {
+              ctx.save();
+              ctx.translate(0, -r * 0.85);
+              ctx.rotate(rot);
+              const h = idx === 2 ? r * 0.44 : r * 0.34;
+              ctx.beginPath();
+              ctx.moveTo(-r * 0.11, 0);
+              ctx.quadraticCurveTo(0, -h, 0, -h);
+              ctx.quadraticCurveTo(0, -h, r * 0.11, 0);
+              ctx.closePath();
+              ctx.fill();
+              ctx.stroke();
+              ctx.restore();
+            });
+            break;
+
+          case 9: // Melon T-stem
+            ctx.strokeStyle = '#588157';
+            ctx.lineWidth = 3.5;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(0, -r * 0.94);
+            ctx.lineTo(0, -r * 1.12);
+            ctx.moveTo(-r * 0.18, -r * 1.12);
+            ctx.lineTo(r * 0.18, -r * 1.12);
+            ctx.stroke();
+            break;
+        }
+        ctx.restore();
+      }
+
+      function drawFruitSurfaceDetails(ctx, tier, r) {
+        switch (tier) {
+          case 1: // Strawberry seeds + top leafy calyx
+            ctx.fillStyle = 'rgba(255, 230, 140, 0.85)';
+            const seeds = [
+              [-0.45, -0.15], [0.45, -0.15], [-0.55, 0.3],
+              [0.55, 0.3], [0, 0.58], [-0.28, 0.5], [0.28, 0.5]
+            ];
+            seeds.forEach(([sx, sy]) => {
+              ctx.beginPath();
+              ctx.ellipse(sx * r, sy * r, r * 0.045, r * 0.075, 0, 0, Math.PI * 2);
+              ctx.fill();
+            });
+            // Green calyx cap inside top edge
+            ctx.fillStyle = '#40916c';
+            ctx.beginPath();
+            ctx.moveTo(-r * 0.55, -r * 0.95);
+            ctx.lineTo(-r * 0.25, -r * 0.65);
+            ctx.lineTo(0, -r * 0.82);
+            ctx.lineTo(r * 0.25, -r * 0.65);
+            ctx.lineTo(r * 0.55, -r * 0.95);
+            ctx.closePath();
+            ctx.fill();
+            break;
+
+          case 2: // Grape cluster subtle outer berry rings (framing face, not crossing eyes)
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
+            ctx.lineWidth = 2;
+            [[-0.52, -0.45], [0.52, -0.45], [-0.58, 0.38], [0.58, 0.38], [0, -0.62]].forEach(([gx, gy]) => {
+              ctx.beginPath();
+              ctx.arc(gx * r, gy * r, r * 0.28, 0, Math.PI * 1.15);
+              ctx.stroke();
+            });
+            break;
+
+          case 4: // Persimmon 4-leaf calyx on top
+            ctx.fillStyle = '#6b705c';
+            for (let i = 0; i < 4; i++) {
+              ctx.save();
+              ctx.translate(0, -r * 0.68);
+              ctx.rotate((i - 1.5) * 0.45);
+              ctx.beginPath();
+              ctx.ellipse(0, 0, r * 0.18, r * 0.08, 0, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.restore();
+            }
+            break;
+
+          case 6: // Pear speckles
+            ctx.fillStyle = 'rgba(100, 120, 20, 0.35)';
+            [[-0.5, 0.2], [0.48, 0.25], [-0.35, 0.52], [0.38, 0.48], [0.55, -0.1]].forEach(([px, py]) => {
+              ctx.beginPath();
+              ctx.arc(px * r, py * r, r * 0.03, 0, Math.PI * 2);
+              ctx.fill();
+            });
+            break;
+
+          case 7: // Peach soft top cleft crease & blush
+            ctx.strokeStyle = 'rgba(201, 66, 98, 0.45)';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(r * 0.12, -r * 0.62, r * 0.32, Math.PI * 0.65, Math.PI * 1.25);
+            ctx.stroke();
+            break;
+
+          case 8: // Pineapple diamond lattice
+            ctx.strokeStyle = 'rgba(163, 98, 0, 0.32)';
+            ctx.lineWidth = 2;
+            const step = r * 0.42;
+            for (let d = -r * 1.5; d <= r * 1.5; d += step) {
+              ctx.beginPath();
+              ctx.moveTo(d - r, -r);
+              ctx.lineTo(d + r, r);
+              ctx.moveTo(d + r, -r);
+              ctx.lineTo(d - r, r);
+              ctx.stroke();
+            }
+            break;
+
+          case 9: // Melon netted cream web
+            ctx.strokeStyle = 'rgba(255, 255, 240, 0.38)';
+            ctx.lineWidth = 2.4;
+            [-0.48, 0, 0.48].forEach(offset => {
+              ctx.beginPath();
+              ctx.ellipse(offset * r * 0.3, 0, r * Math.abs(offset || 0.22), r * 0.96, 0, 0, Math.PI * 2);
+              ctx.stroke();
+            });
+            [-0.4, 0.35].forEach(yOff => {
+              ctx.beginPath();
+              ctx.moveTo(-r, yOff * r);
+              ctx.quadraticCurveTo(0, (yOff + 0.18) * r, r, yOff * r);
+              ctx.stroke();
+            });
+            break;
+
+          case 10: // Watermelon dark wavy vertical stripes
+            ctx.strokeStyle = '#0d4700';
+            ctx.lineWidth = r * 0.11;
+            ctx.lineCap = 'round';
+            [-0.62, -0.22, 0.22, 0.62].forEach(xFrac => {
+              ctx.beginPath();
+              for (let y = -r; y <= r; y += 8) {
+                const wave = Math.sin(y * 0.12) * (r * 0.04);
+                const xPos = xFrac * r * Math.cos((y / r) * 0.55) + wave;
+                if (y === -r) ctx.moveTo(xPos, y);
+                else ctx.lineTo(xPos, y);
+              }
+              ctx.stroke();
+            });
+            break;
+        }
+      }
+
+      function drawKawaiiFace(ctx, tier, r) {
+        const eyeY = r * 0.04;
+        const eyeX = Math.max(4.5, r * 0.26);
+        const eyeR = Math.max(2.1, r * 0.085);
+
+        // Rosy cheeks
+        ctx.fillStyle = 'rgba(255, 105, 135, 0.48)';
+        ctx.beginPath();
+        ctx.ellipse(-eyeX * 1.32, eyeY + eyeR * 1.25, eyeR * 1.35, eyeR * 0.8, 0, 0, Math.PI * 2);
+        ctx.ellipse(eyeX * 1.32, eyeY + eyeR * 1.25, eyeR * 1.35, eyeR * 0.8, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eyes
+        ctx.fillStyle = '#2b1810';
+        ctx.strokeStyle = '#2b1810';
+        ctx.lineWidth = Math.max(1.8, r * 0.045);
+        ctx.lineCap = 'round';
+
+        if (tier === 4) {
+          // Persimmon: cozy happy curved eyes (^ ^)
+          [-eyeX, eyeX].forEach(ex => {
+            ctx.beginPath();
+            ctx.arc(ex, eyeY, eyeR, Math.PI * 1.1, Math.PI * 1.9);
+            ctx.stroke();
+          });
+        } else if (tier === 1) {
+          // Strawberry: cute wink on right eye
+          ctx.beginPath();
+          ctx.arc(-eyeX, eyeY, eyeR, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#fff';
+          ctx.beginPath();
+          ctx.arc(-eyeX - eyeR * 0.3, eyeY - eyeR * 0.3, eyeR * 0.38, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.moveTo(eyeX - eyeR, eyeY);
+          ctx.quadraticCurveTo(eyeX, eyeY - eyeR * 1.1, eyeX + eyeR, eyeY);
+          ctx.stroke();
+        } else {
+          // Shiny kawaii eyes
+          [-eyeX, eyeX].forEach(ex => {
+            ctx.fillStyle = '#2b1810';
+            ctx.beginPath();
+            ctx.arc(ex, eyeY, eyeR, 0, Math.PI * 2);
+            ctx.fill();
+            // White eye shine
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(ex - eyeR * 0.32, eyeY - eyeR * 0.32, eyeR * 0.4, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        }
+
+        // Mouths by personality
+        const mouthY = eyeY + eyeR * 1.1;
+        ctx.strokeStyle = '#2b1810';
+        ctx.fillStyle = '#d90429';
+
+        if (tier >= 9) {
+          // Big joyful open mouth for Melon & Watermelon
+          ctx.beginPath();
+          ctx.arc(0, mouthY, eyeR * 1.55, 0, Math.PI);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          // Little pink tongue
+          ctx.fillStyle = '#ff758f';
+          ctx.beginPath();
+          ctx.arc(0, mouthY + eyeR * 0.85, eyeR * 0.7, 0, Math.PI);
+          ctx.fill();
+        } else if (tier === 2 || tier === 7) {
+          // Cat-like "w" smile for Grape & Peach
+          const w = eyeR * 0.85;
+          ctx.beginPath();
+          ctx.arc(-w, mouthY, w, 0.1, Math.PI - 0.1);
+          ctx.arc(w, mouthY, w, 0.1, Math.PI - 0.1);
+          ctx.stroke();
+        } else {
+          // Classic sweet curved smile
+          ctx.beginPath();
+          ctx.arc(0, mouthY - eyeR * 0.2, eyeR * 1.15, 0.2, Math.PI - 0.2);
+          ctx.stroke();
+        }
+      }
+
+      /* =========================================================================
+       * 4. GAME STATE & PERSISTENCE
+       * ========================================================================= */
+      const BOX_W = 400;
+      const BOX_H = 512;
+      const BOX_LEFT = 20;
+      const BOX_RIGHT = BOX_LEFT + BOX_W;
+      const BOX_TOP = 92;
+      const BOX_BOTTOM = BOX_TOP + BOX_H;
+      const DANGER_Y = BOX_TOP + 26;
+      const DROP_Y = 52;
+
+      let meta = {
+        enhancedBest: 0,
+        classicBest: 0,
+        gamesPlayed: 0,
+        totalMerges: 0,
+        watermelonsMade: 0,
+        doubleSuikaClears: 0,
+        discovered: [true, false, false, false, false, false, false, false, false, false, false],
+        themeIdx: 0
+      };
+
+      let state = {
+        mode: 'enhanced', // 'enhanced' | 'classic'
+        score: 0,
+        nextMilestone: 1000,
+        combo: 1,
+        comboTimer: 0,
+        maxComboRun: 1,
+        largestTierRun: 0,
+        currentTier: 0,
+        nextTier: 0,
+        heldTier: null,
+        canSwapThisTurn: true,
+        shakeCharges: 1,
+        forkCharges: 1,
+        forkTargeting: false,
+        aimX: (BOX_LEFT + BOX_RIGHT) / 2,
+        dropCooldown: 0,
+        dangerTimer: 0,
+        gameOver: false,
+        fruits: [],
+        nextFruitId: 1
+      };
+
+      // Visual-only transient effects
+      let particles = [];
+      let floatingTexts = [];
+      let shockwaves = [];
+      let boxShake = { x: 0, y: 0, intensity: 0 };
+      let hoveredFruitId = null;
+      let keysPressed = { left: false, right: false };
+
+      function loadMeta() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY_META);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            meta = { ...meta, ...parsed };
+            if (!Array.isArray(meta.discovered) || meta.discovered.length !== 11) {
+              meta.discovered = [true, false, false, false, false, false, false, false, false, false, false];
+            }
+          }
+        } catch (e) {
+          console.warn('Could not read meta from localStorage', e);
+        }
+        applyTheme(meta.themeIdx || 0);
+      }
+
+      function saveMeta() {
+        try {
+          localStorage.setItem(STORAGE_KEY_META, JSON.stringify(meta));
+        } catch (e) {
+          // Ignore storage quota errors
+        }
+      }
+
+      function saveActiveState() {
+        if (state.gameOver) {
+          localStorage.removeItem(STORAGE_KEY_STATE);
+          return;
+        }
+        try {
+          const serializable = {
+            mode: state.mode,
+            score: state.score,
+            nextMilestone: state.nextMilestone,
+            maxComboRun: state.maxComboRun,
+            largestTierRun: state.largestTierRun,
+            currentTier: state.currentTier,
+            nextTier: state.nextTier,
+            heldTier: state.heldTier,
+            canSwapThisTurn: state.canSwapThisTurn,
+            shakeCharges: state.shakeCharges,
+            forkCharges: state.forkCharges,
+            fruits: state.fruits.map(f => ({
+              id: f.id,
+              tier: f.tier,
+              x: f.x,
+              y: f.y,
+              vx: f.vx,
+              vy: f.vy,
+              angle: f.angle,
+              omega: f.omega,
+              settled: f.settled
+            })),
+            nextFruitId: state.nextFruitId
+          };
+          localStorage.setItem(STORAGE_KEY_STATE, JSON.stringify(serializable));
+        } catch (e) {
+          // Ignore
+        }
+      }
+
+      function tryRestoreActiveState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY_STATE);
+          if (!raw) return false;
+          const saved = JSON.parse(raw);
+          if (!saved || !Array.isArray(saved.fruits)) return false;
+
+          state.mode = saved.mode || 'enhanced';
+          state.score = saved.score || 0;
+          state.nextMilestone = saved.nextMilestone || 1000;
+          state.maxComboRun = saved.maxComboRun || 1;
+          state.largestTierRun = saved.largestTierRun || 0;
+          state.currentTier = saved.currentTier ?? randomSpawnTier();
+          state.nextTier = saved.nextTier ?? randomSpawnTier();
+          state.heldTier = saved.heldTier ?? null;
+          state.canSwapThisTurn = saved.canSwapThisTurn ?? true;
+          state.shakeCharges = saved.shakeCharges ?? 1;
+          state.forkCharges = saved.forkCharges ?? 1;
+          state.forkTargeting = false;
+          state.gameOver = false;
+          state.dangerTimer = 0;
+          state.nextFruitId = saved.nextFruitId || 100;
+
+          state.fruits = saved.fruits.map(f => ({
+            id: f.id,
+            tier: f.tier,
+            radius: FRUITS[f.tier].radius,
+            mass: FRUITS[f.tier].mass,
+            x: f.x,
+            y: f.y,
+            vx: f.vx || 0,
+            vy: f.vy || 0,
+            angle: f.angle || 0,
+            omega: f.omega || 0,
+            scaleX: 1,
+            scaleY: 1,
+            scaleVel: 0,
+            settled: true,
+            age: 5
+          }));
+          return true;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      function randomSpawnTier() {
+        // Classic Suika spawns tiers 0..4 (Cherry to Persimmon) with weighted probabilities
+        const weights = [0.30, 0.26, 0.20, 0.14, 0.10];
+        const r = Math.random();
+        let acc = 0;
+        for (let i = 0; i < weights.length; i++) {
+          acc += weights[i];
+          if (r <= acc) return i;
+        }
+        return 0;
+      }
+
+      function initNewGame(modeOverride) {
+        const mode = modeOverride || state.mode;
+        state.mode = mode;
+        state.score = 0;
+        state.nextMilestone = 1000;
+        state.combo = 1;
+        state.comboTimer = 0;
+        state.maxComboRun = 1;
+        state.largestTierRun = 0;
+        state.currentTier = randomSpawnTier();
+        state.nextTier = randomSpawnTier();
+        state.heldTier = null;
+        state.canSwapThisTurn = true;
+        state.shakeCharges = mode === 'enhanced' ? 1 : 0;
+        state.forkCharges = mode === 'enhanced' ? 1 : 0;
+        state.forkTargeting = false;
+        state.aimX = (BOX_LEFT + BOX_RIGHT) / 2;
+        state.dropCooldown = 0;
+        state.dangerTimer = 0;
+        state.gameOver = false;
+        state.fruits = [];
+        state.nextFruitId = 1;
+        particles = [];
+        floatingTexts = [];
+        shockwaves = [];
+
+        meta.discovered[state.currentTier] = true;
+        meta.discovered[state.nextTier] = true;
+        saveMeta();
+        saveActiveState();
+        updateUI();
+        renderPreviewSlots();
+        renderEvolutionWheel();
+      }
+
+      /* =========================================================================
+       * 5. PHYSICS & MERGE ENGINE (Sub-stepped 2D Rigid Circles + Pop Impulse)
+       * ========================================================================= */
+      const GRAVITY = 1280; // px/s^2
+      const RESTITUTION = 0.24;
+      const WALL_FRICTION = 0.92;
+      const SUBSTEPS = 8;
+      const COMBO_WINDOW = 2.3; // seconds
+
+      function clampAimX(x, tier) {
+        const r = FRUITS[tier].radius;
+        return Math.max(BOX_LEFT + r + 4, Math.min(BOX_RIGHT - r - 4, x));
+      }
+
+      function dropCurrentFruit() {
+        if (state.gameOver || state.dropCooldown > 0 || state.forkTargeting) return;
+
+        const tier = state.currentTier;
+        const spec = FRUITS[tier];
+        const spawnX = clampAimX(state.aimX, tier);
+
+        const fruit = {
+          id: state.nextFruitId++,
+          tier,
+          radius: spec.radius,
+          mass: spec.mass,
+          x: spawnX,
+          y: DROP_Y,
+          vx: (Math.random() - 0.5) * 6, // tiny natural asymmetry so vertical stacks roll
+          vy: 40,
+          angle: 0,
+          omega: 0,
+          scaleX: 1.14,
+          scaleY: 0.88,
+          scaleVel: 0,
+          settled: false,
+          age: 0
+        };
+
+        state.fruits.push(fruit);
+        sound.playDrop();
+
+        // Advance queue
+        state.currentTier = state.nextTier;
+        state.nextTier = randomSpawnTier();
+        state.canSwapThisTurn = true;
+        state.dropCooldown = 0.42; // 420ms between drops
+
+        meta.discovered[state.currentTier] = true;
+        meta.discovered[state.nextTier] = true;
+        if (tier > state.largestTierRun) state.largestTierRun = tier;
+
+        saveActiveState();
+        updateUI();
+        renderPreviewSlots();
+        renderEvolutionWheel();
+      }
+
+      function swapHoldFruit() {
+        if (state.mode !== 'enhanced' || !state.canSwapThisTurn || state.gameOver) return;
+
+        sound.playSwap();
+        if (state.heldTier === null) {
+          state.heldTier = state.currentTier;
+          state.currentTier = state.nextTier;
+          state.nextTier = randomSpawnTier();
+        } else {
+          const tmp = state.currentTier;
+          state.currentTier = state.heldTier;
+          state.heldTier = tmp;
+        }
+        state.canSwapThisTurn = false;
+        state.aimX = clampAimX(state.aimX, state.currentTier);
+        saveActiveState();
+        updateUI();
+        renderPreviewSlots();
+      }
+
+      function triggerShakeBox() {
+        if (state.mode !== 'enhanced' || state.shakeCharges <= 0 || state.gameOver || state.fruits.length === 0) return;
+
+        state.shakeCharges--;
+        state.forkTargeting = false;
+        sound.playShake();
+        boxShake.intensity = 14;
+
+        // Apply upward + lateral jolt to all fruits
+        for (const f of state.fruits) {
+          f.vy -= 260 + Math.random() * 140;
+          f.vx += (Math.random() - 0.5) * 320;
+          f.omega += (Math.random() - 0.5) * 6;
+          f.scaleX = 1.18;
+          f.scaleY = 0.84;
+        }
+
+        floatingTexts.push({
+          x: (BOX_LEFT + BOX_RIGHT) / 2,
+          y: BOX_TOP + 90,
+          text: '🫨 BOX SHAKE!',
+          color: '#ff6b35',
+          size: 22,
+          life: 1.0,
+          maxLife: 1.0
+        });
+
+        saveActiveState();
+        updateUI();
+      }
+
+      function toggleForkTargeting() {
+        if (state.mode !== 'enhanced' || state.forkCharges <= 0 || state.gameOver || state.fruits.length === 0) return;
+        state.forkTargeting = !state.forkTargeting;
+        updateUI();
+      }
+
+      function executeForkPopAt(canvasX, canvasY) {
+        if (!state.forkTargeting || state.forkCharges <= 0) return false;
+        // Find top-most fruit under cursor
+        for (let i = state.fruits.length - 1; i >= 0; i--) {
+          const f = state.fruits[i];
+          const dx = canvasX - f.x;
+          const dy = canvasY - f.y;
+          if (dx * dx + dy * dy <= (f.radius + 6) * (f.radius + 6)) {
+            state.fruits.splice(i, 1);
+            state.forkCharges--;
+            state.forkTargeting = false;
+            hoveredFruitId = null;
+            sound.playForkPop();
+
+            spawnJuiceBurst(f.x, f.y, FRUITS[f.tier].color1, FRUITS[f.tier].color2, 22);
+            floatingTexts.push({
+              x: f.x,
+              y: f.y - 10,
+              text: '🍴 POPPED!',
+              color: '#ff477e',
+              size: 19,
+              life: 0.9,
+              maxLife: 0.9
+            });
+
+            saveActiveState();
+            updateUI();
+            return true;
+          }
+        }
+        return false;
+      }
+
+      function awardScore(basePoints, x, y, labelPrefix = '') {
+        const gained = Math.round(basePoints * state.combo);
+        state.score += gained;
+
+        const bestKey = state.mode === 'enhanced' ? 'enhancedBest' : 'classicBest';
+        if (state.score > meta[bestKey]) {
+          meta[bestKey] = state.score;
+        }
+
+        // Check milestone economy in Enhanced Mode
+        if (state.mode === 'enhanced') {
+          while (state.score >= state.nextMilestone) {
+            state.nextMilestone += 1000;
+            grantBonusCharge('Milestone +1 Tool!');
+          }
+        }
+
+        const comboTag = state.combo > 1 ? ` (${state.combo}x!)` : '';
+        floatingTexts.push({
+          x,
+          y,
+          text: `${labelPrefix}+${gained}${comboTag}`,
+          color: state.combo >= 3 ? '#f72585' : '#ff6b35',
+          size: Math.min(30, 16 + state.combo * 2),
+          life: 1.05,
+          maxLife: 1.05
+        });
+      }
+
+      function grantBonusCharge(reasonText) {
+        if (state.mode !== 'enhanced') return;
+        let granted = null;
+        if (state.shakeCharges < 3 && (state.shakeCharges <= state.forkCharges || state.forkCharges >= 3)) {
+          state.shakeCharges++;
+          granted = '🫨 +1 Shake!';
+        } else if (state.forkCharges < 3) {
+          state.forkCharges++;
+          granted = '🍴 +1 Fork!';
+        }
+        if (granted) {
+          const activeBanners = floatingTexts.filter(ft => ft.color === '#2ec4b6').length;
+          floatingTexts.push({
+            x: (BOX_LEFT + BOX_RIGHT) / 2,
+            y: BOX_TOP + 54 + activeBanners * 24,
+            text: `${reasonText} ${granted}`,
+            color: '#2ec4b6',
+            size: 18,
+            life: 1.3,
+            maxLife: 1.3
+          });
+        }
+      }
+
+      function spawnJuiceBurst(x, y, color1, color2, count = 18) {
+        for (let i = 0; i < count; i++) {
+          const ang = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.4;
+          const spd = 60 + Math.random() * 190;
+          particles.push({
+            x,
+            y,
+            vx: Math.cos(ang) * spd,
+            vy: Math.sin(ang) * spd - 40,
+            r: 3 + Math.random() * 5,
+            color: i % 2 === 0 ? color1 : color2,
+            life: 0.45 + Math.random() * 0.35,
+            maxLife: 0.8
+          });
+        }
+      }
+
+      function handleFruitMerge(fA, fB) {
+        const midX = (fA.x + fB.x) * 0.5;
+        const midY = (fA.y + fB.y) * 0.5;
+        const tier = fA.tier;
+
+        // Remove both fruits
+        state.fruits = state.fruits.filter(f => f.id !== fA.id && f.id !== fB.id);
+
+        // Update combo
+        if (state.comboTimer > 0) {
+          state.combo++;
+        } else {
+          state.combo = 1;
+        }
+        state.comboTimer = COMBO_WINDOW;
+        if (state.combo > state.maxComboRun) state.maxComboRun = state.combo;
+
+        meta.totalMerges++;
+
+        // Special Case: Double Watermelon Merge (Tier 10 + Tier 10)
+        if (tier === 10) {
+          meta.doubleSuikaClears++;
+          sound.playDoubleWatermelon();
+          boxShake.intensity = 18;
+          spawnJuiceBurst(midX, midY, '#38b000', '#ff2a55', 55);
+          shockwaves.push({ x: midX, y: midY, r: 20, maxR: 220, color: '#ffbe0b', life: 0.6, maxLife: 0.6 });
+          awardScore(500, midX, midY, '🍉 DOUBLE SUIKA! ');
+          grantBonusCharge('Double Suika!');
+          // Radial blast pushes remaining fruits playfully
+          applyRadialMergeImpulse(midX, midY, 160, 320);
+          saveMeta();
+          saveActiveState();
+          updateUI();
+          return;
+        }
+
+        const nextTier = tier + 1;
+        const spec = FRUITS[nextTier];
+
+        // Clamp inside container bounds so large merged fruits don't clip walls
+        const clampedX = Math.max(BOX_LEFT + spec.radius, Math.min(BOX_RIGHT - spec.radius, midX));
+        const clampedY = Math.min(BOX_BOTTOM - spec.radius, midY);
+
+        const mergedFruit = {
+          id: state.nextFruitId++,
+          tier: nextTier,
+          radius: spec.radius,
+          mass: spec.mass,
+          x: clampedX,
+          y: clampedY,
+          vx: (fA.vx + fB.vx) * 0.35,
+          vy: Math.min((fA.vy + fB.vy) * 0.35, -60), // slight upward pop
+          angle: (fA.angle + fB.angle) * 0.5,
+          omega: (fA.omega + fB.omega) * 0.4,
+          scaleX: 1.28,
+          scaleY: 0.76,
+          scaleVel: 0,
+          settled: true,
+          age: 1
+        };
+
+        state.fruits.push(mergedFruit);
+
+        if (nextTier > state.largestTierRun) state.largestTierRun = nextTier;
+        if (nextTier === 10) meta.watermelonsMade++;
+
+        const newlyDiscovered = !meta.discovered[nextTier];
+        meta.discovered[nextTier] = true;
+
+        // Big-merge tactical economy (Pineapple, Melon, Watermelon)
+        if (state.mode === 'enhanced' && nextTier >= 8) {
+          grantBonusCharge(`${spec.name} Created!`);
+        }
+
+        sound.playMerge(nextTier, state.combo);
+        spawnJuiceBurst(clampedX, clampedY, spec.color1, spec.color2, 14 + nextTier * 2);
+        shockwaves.push({
+          x: clampedX,
+          y: clampedY,
+          r: spec.radius * 0.6,
+          maxR: spec.radius * 1.65,
+          color: spec.color1,
+          life: 0.32,
+          maxLife: 0.32
+        });
+
+        // Authentic Juicy Suika Radial "Pop" Nudge on nearby fruits
+        applyRadialMergeImpulse(clampedX, clampedY, spec.radius * 2.35, 55 + nextTier * 14, mergedFruit.id);
+
+        awardScore(spec.score, clampedX, clampedY - spec.radius * 0.4, newlyDiscovered ? `NEW! ${spec.name} ` : '');
+
+        saveMeta();
+        saveActiveState();
+        updateUI();
+        if (newlyDiscovered) renderEvolutionWheel();
+      }
+
+      function applyRadialMergeImpulse(cx, cy, blastRadius, strength, excludeId = -1) {
+        for (const f of state.fruits) {
+          if (f.id === excludeId) continue;
+          const dx = f.x - cx;
+          const dy = f.y - cy;
+          const dist = Math.hypot(dx, dy);
+          if (dist > 0.001 && dist < blastRadius + f.radius) {
+            const falloff = Math.max(0, 1 - dist / (blastRadius + f.radius));
+            const impulse = (strength * falloff) / Math.pow(f.mass, 0.35);
+            f.vx += (dx / dist) * impulse;
+            f.vy += (dy / dist) * impulse - 25 * falloff;
+            f.omega += (dx / dist) * falloff * 2.2;
+          }
+        }
+      }
+
+      let autoSaveTimer = 0;
+
+      function stepPhysics(dt) {
+        if (state.gameOver) return;
+
+        // Keyboard continuous aiming
+        const aimSpeed = 340;
+        if (keysPressed.left) {
+          state.aimX = clampAimX(state.aimX - aimSpeed * dt, state.currentTier);
+        }
+        if (keysPressed.right) {
+          state.aimX = clampAimX(state.aimX + aimSpeed * dt, state.currentTier);
+        }
+
+        if (state.dropCooldown > 0) {
+          state.dropCooldown = Math.max(0, state.dropCooldown - dt);
+        }
+
+        if (state.comboTimer > 0) {
+          state.comboTimer = Math.max(0, state.comboTimer - dt);
+          if (state.comboTimer === 0 && state.combo > 1) {
+            state.combo = 1;
+            updateUI();
+          }
+          const bar = document.getElementById('comboBar');
+          if (bar) bar.style.width = `${(state.comboTimer / COMBO_WINDOW) * 100}%`;
+        }
+
+        // Spring squash-and-stretch recovery
+        for (const f of state.fruits) {
+          f.age += dt;
+          const k = 180;
+          const damp = 14;
+          const force = (1 - f.scaleX) * k;
+          f.scaleVel += force * dt;
+          f.scaleVel *= Math.exp(-damp * dt);
+          f.scaleX += f.scaleVel * dt;
+          f.scaleY = 1 / Math.max(0.72, Math.min(1.35, f.scaleX));
+        }
+
+        const subDt = dt / SUBSTEPS;
+        let mergePair = null;
+        let newlySettled = false;
+
+        for (let step = 0; step < SUBSTEPS; step++) {
+          // 1. Integrate gravity & velocity
+          for (const f of state.fruits) {
+            f.vy += GRAVITY * subDt;
+            f.vx *= Math.pow(0.997, subDt * 60);
+            f.vy *= Math.pow(0.998, subDt * 60);
+            f.omega *= Math.pow(0.92, subDt * 60);
+
+            f.x += f.vx * subDt;
+            f.y += f.vy * subDt;
+            f.angle += f.omega * subDt;
+          }
+
+          // 2. Circle-to-Circle Collisions
+          const n = state.fruits.length;
+          for (let i = 0; i < n; i++) {
+            const fA = state.fruits[i];
+            for (let j = i + 1; j < n; j++) {
+              const fB = state.fruits[j];
+              const dx = fB.x - fA.x;
+              const dy = fB.y - fA.y;
+              const minDist = fA.radius + fB.radius;
+              const distSq = dx * dx + dy * dy;
+
+              if (distSq < minDist * minDist) {
+                // Check if same tier -> schedule merge!
+                if (fA.tier === fB.tier && !mergePair) {
+                  mergePair = [fA, fB];
+                }
+
+                const dist = Math.sqrt(distSq) || 0.01;
+                let nx = dx / dist;
+                let ny = dy / dist;
+                const overlap = minDist - dist;
+
+                // Mark settled on first fruit-to-fruit contact
+                if (!fA.settled || !fB.settled) {
+                  newlySettled = true;
+                  const relSpd = Math.hypot(fB.vx - fA.vx, fB.vy - fA.vy);
+                  if (relSpd > 110) {
+                    sound.playThud(Math.min(0.8, relSpd / 600));
+                  }
+                  fA.settled = true;
+                  fB.settled = true;
+                }
+
+                // Positional correction weighted by inverse mass
+                const invMassA = 1 / fA.mass;
+                const invMassB = 1 / fB.mass;
+                const invMassSum = invMassA + invMassB;
+                const corr = overlap * 0.95 / invMassSum;
+
+                fA.x -= nx * corr * invMassA;
+                fA.y -= ny * corr * invMassA;
+                fB.x += nx * corr * invMassB;
+                fB.y += ny * corr * invMassB;
+
+                // Slippery crown roll-off assist: if one fruit is on top of another,
+                // enforce a minimum horizontal roll-off slope so it never lingers on the crown
+                let impNx = nx;
+                let impNy = ny;
+                if (Math.abs(ny) > 0.65) {
+                  const dirX = Math.abs(dx) > 0.2 ? Math.sign(dx) : (fA.id < fB.id ? 1 : -1);
+                  const minSlope = 0.26;
+                  if (Math.abs(impNx) < minSlope) {
+                    impNx = dirX * minSlope;
+                    // Keep unit normal length
+                    const len = Math.hypot(impNx, impNy);
+                    impNx /= len;
+                    impNy /= len;
+                  }
+                  // Continuous gravity slide acceleration along the crown slope
+                  const crownSlideAccel = 420 * subDt;
+                  if (dy < 0) {
+                    // fB is on top of fA
+                    fB.vx += dirX * crownSlideAccel;
+                  } else {
+                    // fA is on top of fB
+                    fA.vx -= dirX * crownSlideAccel;
+                  }
+                }
+
+                // Relative velocity along normal
+                const rvx = fB.vx - fA.vx;
+                const rvy = fB.vy - fA.vy;
+                const velAlongNormal = rvx * impNx + rvy * impNy;
+
+                if (velAlongNormal < 0) {
+                  const jImpulse = -(1 + RESTITUTION) * velAlongNormal / invMassSum;
+                  const impX = jImpulse * impNx;
+                  const impY = jImpulse * impNy;
+
+                  fA.vx -= impX * invMassA;
+                  fA.vy -= impY * invMassA;
+                  fB.vx += impX * invMassB;
+                  fB.vy += impY * invMassB;
+                }
+
+                // Visual rolling rotation smoothly tracks actual horizontal velocity (zero spin-in-place)
+                const rollBlend = 0.2;
+                fA.omega = fA.omega * (1 - rollBlend) + (fA.vx / fA.radius) * rollBlend;
+                fB.omega = fB.omega * (1 - rollBlend) + (fB.vx / fB.radius) * rollBlend;
+              }
+            }
+          }
+
+          // 3. Wall & Floor Constraints (applied after circle separation so bottom fruits stay grounded)
+          for (const f of state.fruits) {
+            if (f.x - f.radius < BOX_LEFT) {
+              f.x = BOX_LEFT + f.radius;
+              if (f.vx < 0) f.vx = -f.vx * RESTITUTION;
+            } else if (f.x + f.radius > BOX_RIGHT) {
+              f.x = BOX_RIGHT - f.radius;
+              if (f.vx > 0) f.vx = -f.vx * RESTITUTION;
+            }
+
+            if (f.y + f.radius > BOX_BOTTOM) {
+              if (!f.settled) {
+                newlySettled = true;
+                if (Math.abs(f.vy) > 90) {
+                  sound.playThud(Math.min(1, Math.abs(f.vy) / 500));
+                  f.scaleX = 1.12;
+                  f.scaleY = 0.89;
+                }
+              }
+              f.settled = true;
+              f.y = BOX_BOTTOM - f.radius;
+              if (f.vy > 0) f.vy = -f.vy * RESTITUTION;
+              f.vx *= Math.pow(WALL_FRICTION, subDt * 60);
+              // Natural floor rolling rotation proportional to horizontal speed
+              f.omega = f.vx / f.radius;
+            }
+          }
+
+          if (mergePair) {
+            handleFruitMerge(mergePair[0], mergePair[1]);
+            break;
+          }
+        }
+
+        // Persist settled positions so page reloads & state inspections always have live coordinates
+        autoSaveTimer += dt;
+        if (newlySettled || (autoSaveTimer >= 0.35 && state.fruits.length > 0)) {
+          autoSaveTimer = 0;
+          saveActiveState();
+        }
+
+        // 3. Check Top Danger Line Overflow (2.5s Grace Period)
+        let overflowing = false;
+        for (const f of state.fruits) {
+          if (f.settled && f.age > 0.45 && (f.y - f.radius) < DANGER_Y) {
+            overflowing = true;
+            break;
+          }
+        }
+
+        if (overflowing) {
+          const prevSec = Math.floor(state.dangerTimer * 2.5);
+          state.dangerTimer += dt;
+          const nextSec = Math.floor(state.dangerTimer * 2.5);
+          if (nextSec > prevSec) {
+            sound.playDangerBeep();
+          }
+          if (state.dangerTimer >= 2.5) {
+            triggerGameOver();
+          }
+        } else {
+          state.dangerTimer = Math.max(0, state.dangerTimer - dt * 1.8);
+        }
+
+        // 4. Update Particles, Shockwaves, Floating Texts & Box Shake
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.vy += 460 * dt;
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.life -= dt;
+          if (p.life <= 0) particles.splice(i, 1);
+        }
+
+        for (let i = shockwaves.length - 1; i >= 0; i--) {
+          const sw = shockwaves[i];
+          sw.life -= dt;
+          const prog = 1 - sw.life / sw.maxLife;
+          sw.curR = sw.r + (sw.maxR - sw.r) * prog;
+          if (sw.life <= 0) shockwaves.splice(i, 1);
+        }
+
+        for (let i = floatingTexts.length - 1; i >= 0; i--) {
+          const ft = floatingTexts[i];
+          ft.y -= 36 * dt;
+          ft.life -= dt;
+          if (ft.life <= 0) floatingTexts.splice(i, 1);
+        }
+
+        if (boxShake.intensity > 0.1) {
+          boxShake.x = (Math.random() - 0.5) * boxShake.intensity;
+          boxShake.y = (Math.random() - 0.5) * boxShake.intensity;
+          boxShake.intensity *= Math.exp(-12 * dt);
+        } else {
+          boxShake.x = 0;
+          boxShake.y = 0;
+          boxShake.intensity = 0;
+        }
+      }
+
+      function triggerGameOver() {
+        state.gameOver = true;
+        meta.gamesPlayed++;
+        saveMeta();
+        localStorage.removeItem(STORAGE_KEY_STATE);
+
+        document.getElementById('goScore').textContent = state.score.toLocaleString();
+        const best = state.mode === 'enhanced' ? meta.enhancedBest : meta.classicBest;
+        document.getElementById('goBest').textContent = best.toLocaleString();
+        document.getElementById('goCombo').textContent = `${state.maxComboRun}x`;
+        document.getElementById('goLargest').textContent = FRUITS[state.largestTierRun].name;
+
+        const modal = document.getElementById('gameOverModal');
+        if (modal && !modal.open) modal.showModal();
+      }
+
+      /* =========================================================================
+       * 6. RENDERING PIPELINE (Main Canvas, Cloud Dropper, Preview, Evo Ring)
+       * ========================================================================= */
+      const gameCanvas = document.getElementById('gameCanvas');
+      const gameCtx = gameCanvas.getContext('2d');
+
+      function setupHighDPICanvas(canvas, logicalW, logicalH) {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = logicalW * dpr;
+        canvas.height = logicalH * dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        return ctx;
+      }
+
+      setupHighDPICanvas(gameCanvas, 440, 620);
+
+      function computeDropLandingY(aimX, radius) {
+        let minY = BOX_BOTTOM - radius;
+        for (const f of state.fruits) {
+          const dx = Math.abs(aimX - f.x);
+          const combined = radius + f.radius;
+          if (dx < combined) {
+            const dy = Math.sqrt(combined * combined - dx * dx);
+            const candidateY = f.y - dy;
+            if (candidateY < minY && candidateY >= DROP_Y) {
+              minY = candidateY;
+            }
+          }
+        }
+        return minY;
+      }
+
+      function drawCloudCharacter(ctx, x, y, holdingFork) {
+        ctx.save();
+        ctx.translate(x, y);
+
+        const puffs = [
+          [-16, 2, 11],
+          [-5, -4, 13],
+          [8, -3, 12],
+          [17, 2, 10],
+          [0, 3, 12]
+        ];
+
+        // 1. Soft outer border pass (no internal chord lines!)
+        ctx.fillStyle = 'rgba(120, 100, 90, 0.38)';
+        for (const [px, py, pr] of puffs) {
+          ctx.beginPath();
+          ctx.arc(px, py, pr + 2.2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // 2. Pure white fluffy cloud interior
+        ctx.fillStyle = '#ffffff';
+        for (const [px, py, pr] of puffs) {
+          ctx.beginPath();
+          ctx.arc(px, py, pr, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Cloud eyes & cheeks
+        ctx.fillStyle = '#ff8fab';
+        ctx.beginPath();
+        ctx.arc(-11, 3, 3, 0, Math.PI * 2);
+        ctx.arc(11, 3, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#3d2b1f';
+        ctx.beginPath();
+        ctx.arc(-6, 0, 2.2, 0, Math.PI * 2);
+        ctx.arc(6, 0, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Cute little smile
+        ctx.strokeStyle = '#3d2b1f';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.arc(0, 1, 3.2, 0.2, Math.PI - 0.2);
+        ctx.stroke();
+
+        if (holdingFork) {
+          // Draw cute silver fork next to cloud
+          ctx.save();
+          ctx.translate(28, 8);
+          ctx.rotate(0.25);
+          ctx.strokeStyle = '#6c757d';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(0, -14);
+          ctx.lineTo(0, 8);
+          ctx.moveTo(-5, 8);
+          ctx.lineTo(5, 8);
+          ctx.moveTo(-5, 8);
+          ctx.lineTo(-5, 16);
+          ctx.moveTo(0, 8);
+          ctx.lineTo(0, 16);
+          ctx.moveTo(5, 8);
+          ctx.lineTo(5, 16);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        ctx.restore();
+      }
+
+      function renderGameCanvas() {
+        const ctx = gameCtx;
+        ctx.clearRect(0, 0, 440, 620);
+
+        const styles = getComputedStyle(document.documentElement);
+        const boxBg = styles.getPropertyValue('--box-bg').trim() || 'rgba(255,248,234,0.82)';
+        const wallColor = styles.getPropertyValue('--box-wall').trim() || '#b57c43';
+        const wallDark = styles.getPropertyValue('--box-wall-dark').trim() || '#875627';
+        const dangerColor = styles.getPropertyValue('--danger').trim() || '#e63946';
+
+        ctx.save();
+        ctx.translate(boxShake.x, boxShake.y);
+
+        // 1. Back Wall & Container Interior
+        ctx.fillStyle = boxBg;
+        ctx.beginPath();
+        ctx.roundRect(BOX_LEFT, BOX_TOP, BOX_W, BOX_H, [4, 4, 18, 18]);
+        ctx.fill();
+
+        // Subtle vertical depth lines inside box
+        ctx.strokeStyle = 'rgba(140, 100, 60, 0.06)';
+        ctx.lineWidth = 1.5;
+        for (let x = BOX_LEFT + 50; x < BOX_RIGHT; x += 50) {
+          ctx.beginPath();
+          ctx.moveTo(x, BOX_TOP);
+          ctx.lineTo(x, BOX_BOTTOM);
+          ctx.stroke();
+        }
+
+        // 2. Aiming Guide Line & Current Fruit in Cloud Dropper
+        const curTier = state.currentTier;
+        const curRadius = FRUITS[curTier].radius;
+        const clampedAimX = clampAimX(state.aimX, curTier);
+        const heldFruitY = 28 + curRadius * 0.72;
+
+        if (!state.gameOver) {
+          if (!state.forkTargeting && state.dropCooldown <= 0) {
+            const landingY = computeDropLandingY(clampedAimX, curRadius);
+            // Dotted trajectory line
+            ctx.save();
+            ctx.strokeStyle = 'rgba(130, 100, 80, 0.42)';
+            ctx.lineWidth = 2.2;
+            ctx.setLineDash([6, 6]);
+            ctx.beginPath();
+            ctx.moveTo(clampedAimX, heldFruitY + curRadius);
+            ctx.lineTo(clampedAimX, landingY);
+            ctx.stroke();
+
+            // Ghost landing ring
+            ctx.strokeStyle = FRUITS[curTier].color1;
+            ctx.globalAlpha = 0.32;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.arc(clampedAimX, landingY, curRadius, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+
+            // Draw held fruit first so Poppy the Cloud sits cozily above its top rim
+            drawFruitIllustration(ctx, curTier, clampedAimX, heldFruitY, curRadius, 0, 1, 1, false);
+          }
+
+          // Cloud character at top (always visible above held fruit)
+          drawCloudCharacter(ctx, clampedAimX, 20, state.forkTargeting);
+        }
+
+        // 3. Top Danger Line & Grace Timer Indicator
+        ctx.save();
+        const isDangerActive = state.dangerTimer > 0.05;
+        ctx.strokeStyle = isDangerActive ? dangerColor : 'rgba(230, 57, 70, 0.35)';
+        ctx.lineWidth = isDangerActive ? 3 : 2;
+        ctx.setLineDash([8, 6]);
+        ctx.beginPath();
+        ctx.moveTo(BOX_LEFT + 4, DANGER_Y);
+        ctx.lineTo(BOX_RIGHT - 4, DANGER_Y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        if (isDangerActive) {
+          const remain = Math.max(0, 2.5 - state.dangerTimer).toFixed(1);
+          const pct = Math.min(1, state.dangerTimer / 2.5);
+          ctx.fillStyle = 'rgba(230, 57, 70, 0.14)';
+          ctx.fillRect(BOX_LEFT, BOX_TOP, BOX_W, DANGER_Y - BOX_TOP);
+
+          ctx.fillStyle = dangerColor;
+          ctx.font = '800 13px sans-serif';
+          ctx.textAlign = 'right';
+          ctx.fillText(`⚠️ OVERFLOW IN ${remain}s`, BOX_RIGHT - 10, DANGER_Y - 6);
+
+          // Progress bar along danger line
+          ctx.fillRect(BOX_LEFT, DANGER_Y - 2, BOX_W * pct, 4);
+        }
+        ctx.restore();
+
+        // 4. Shockwaves
+        for (const sw of shockwaves) {
+          ctx.save();
+          ctx.strokeStyle = sw.color;
+          ctx.globalAlpha = Math.max(0, sw.life / sw.maxLife) * 0.65;
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.arc(sw.x, sw.y, sw.curR || sw.r, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // 5. All Physics Fruits inside Container (clipped to left/right/bottom walls, open at top)
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(BOX_LEFT - 2, 0, BOX_W + 4, BOX_BOTTOM + 2);
+        ctx.clip();
+        for (const f of state.fruits) {
+          const isTargeted = state.forkTargeting && f.id === hoveredFruitId;
+          drawFruitIllustration(ctx, f.tier, f.x, f.y, f.radius, f.angle, f.scaleX, f.scaleY, isTargeted);
+        }
+        ctx.restore();
+
+        // 6. Juice Particles
+        for (const p of particles) {
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, p.life / p.maxLife);
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // 7. 3D Wooden / Glass Container Frame Walls (Left, Bottom, Right)
+        ctx.save();
+        ctx.strokeStyle = wallColor;
+        ctx.lineWidth = 12;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(BOX_LEFT - 4, BOX_TOP);
+        ctx.lineTo(BOX_LEFT - 4, BOX_BOTTOM + 4);
+        ctx.lineTo(BOX_RIGHT + 4, BOX_BOTTOM + 4);
+        ctx.lineTo(BOX_RIGHT + 4, BOX_TOP);
+        ctx.stroke();
+
+        // Outer dark rim border
+        ctx.strokeStyle = wallDark;
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        ctx.restore();
+
+        // 8. Floating Score & Combo Texts
+        for (const ft of floatingTexts) {
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, Math.min(1, (ft.life / ft.maxLife) * 1.4));
+          ctx.font = `900 ${ft.size}px var(--font-sans, sans-serif)`;
+          ctx.textAlign = 'center';
+          ctx.lineWidth = 4;
+          ctx.strokeStyle = '#ffffff';
+          ctx.strokeText(ft.text, ft.x, ft.y);
+          ctx.fillStyle = ft.color;
+          ctx.fillText(ft.text, ft.x, ft.y);
+          ctx.restore();
+        }
+
+        // 9. Fork Targeting Banner inside canvas if active
+        if (state.forkTargeting) {
+          ctx.save();
+          ctx.fillStyle = 'rgba(255, 71, 126, 0.92)';
+          ctx.beginPath();
+          ctx.roundRect(BOX_LEFT + 45, BOX_TOP + 12, BOX_W - 90, 32, 10);
+          ctx.fill();
+          ctx.fillStyle = '#fff';
+          ctx.font = '800 13px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('🍴 Click any fruit to pop it! (Esc to cancel)', (BOX_LEFT + BOX_RIGHT) / 2, BOX_TOP + 33);
+          ctx.restore();
+        }
+
+        ctx.restore();
+      }
+
+      /* =========================================================================
+       * 7. SIDE PANELS: HOLD/NEXT SLOTS, EVOLUTION WHEEL & UI SYNC
+       * ========================================================================= */
+      const holdCanvas = document.getElementById('holdCanvas');
+      const nextCanvas = document.getElementById('nextCanvas');
+      const evoCanvas = document.getElementById('evoCanvas');
+
+      function renderPreviewSlots() {
+        // Hold Slot
+        const hCtx = holdCanvas.getContext('2d');
+        hCtx.clearRect(0, 0, holdCanvas.width, holdCanvas.height);
+        if (state.heldTier !== null) {
+          const spec = FRUITS[state.heldTier];
+          const previewR = Math.min(44, spec.radius * 1.15);
+          drawFruitIllustration(hCtx, state.heldTier, 68, 72, previewR);
+          document.getElementById('holdFruitName').textContent = spec.name;
+        } else {
+          hCtx.save();
+          hCtx.strokeStyle = 'rgba(150, 120, 90, 0.35)';
+          hCtx.lineWidth = 3;
+          hCtx.setLineDash([5, 5]);
+          hCtx.beginPath();
+          hCtx.arc(68, 68, 32, 0, Math.PI * 2);
+          hCtx.stroke();
+          hCtx.restore();
+          document.getElementById('holdFruitName').textContent = state.mode === 'enhanced' ? 'Empty' : 'Disabled';
+        }
+
+        // Next Slot
+        const nCtx = nextCanvas.getContext('2d');
+        nCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
+        const nextSpec = FRUITS[state.nextTier];
+        const nextR = Math.min(44, nextSpec.radius * 1.15);
+        drawFruitIllustration(nCtx, state.nextTier, 68, 72, nextR);
+        document.getElementById('nextFruitName').textContent = nextSpec.name;
+      }
+
+      function renderEvolutionWheel() {
+        const ctx = evoCanvas.getContext('2d');
+        const W = evoCanvas.width;
+        const H = evoCanvas.height;
+        ctx.clearRect(0, 0, W, H);
+
+        const cx = W / 2;
+        const cy = H / 2;
+        const ringR = 152;
+
+        // Draw connecting circle track
+        ctx.save();
+        ctx.strokeStyle = 'rgba(160, 120, 80, 0.25)';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.arc(cx, cy, ringR, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+
+        let foundCount = 0;
+        for (let i = 0; i < FRUITS.length; i++) {
+          if (meta.discovered[i]) foundCount++;
+          // Arrange clockwise starting from top-left
+          const angle = -Math.PI * 0.5 + (i / FRUITS.length) * Math.PI * 2;
+          const fx = cx + Math.cos(angle) * ringR;
+          const fy = cy + Math.sin(angle) * ringR;
+          const iconR = 16 + i * 1.45;
+
+          // Little directional arrow along ring
+          const nextAng = angle + (0.5 / FRUITS.length) * Math.PI * 2;
+          const ax = cx + Math.cos(nextAng) * ringR;
+          const ay = cy + Math.sin(nextAng) * ringR;
+          ctx.save();
+          ctx.fillStyle = 'rgba(150, 110, 70, 0.5)';
+          ctx.beginPath();
+          ctx.arc(ax, ay, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+
+          if (meta.discovered[i]) {
+            drawFruitIllustration(ctx, i, fx, fy, iconR);
+          } else {
+            ctx.save();
+            ctx.fillStyle = 'rgba(120, 100, 90, 0.22)';
+            ctx.beginPath();
+            ctx.arc(fx, fy, iconR, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = 'rgba(90, 70, 60, 0.6)';
+            ctx.font = '800 16px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('?', fx, fy);
+            ctx.restore();
+          }
+        }
+
+        // Center emblem
+        ctx.save();
+        ctx.fillStyle = 'rgba(150, 110, 75, 0.75)';
+        ctx.font = '900 18px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('EVOLUTION', cx, cy - 6);
+        ctx.font = '700 14px sans-serif';
+        ctx.fillText('Cherry ➔ Suika', cx, cy + 14);
+        ctx.restore();
+
+        document.getElementById('discoveredCount').textContent = `${foundCount} / 11 Found`;
+      }
+
+      function renderChargePips(containerId, count) {
+        const el = document.getElementById(containerId);
+        if (!el) return;
+        el.innerHTML = '';
+        for (let i = 0; i < 3; i++) {
+          const pip = document.createElement('span');
+          pip.className = 'pip' + (i < count ? ' filled' : '');
+          el.appendChild(pip);
+        }
+      }
+
+      function updateUI() {
+        const isEnhanced = state.mode === 'enhanced';
+        document.getElementById('modeToggleBtn').textContent = isEnhanced ? '✨ Enhanced Mode' : '🍉 Pure Classic';
+        document.getElementById('highScoreModeTag').textContent = isEnhanced ? 'Enhanced Best' : 'Classic Best';
+
+        document.getElementById('scoreVal').textContent = state.score.toLocaleString();
+        const best = isEnhanced ? meta.enhancedBest : meta.classicBest;
+        document.getElementById('bestVal').textContent = best.toLocaleString();
+
+        document.getElementById('comboText').textContent = `Combo ${state.combo}x`;
+
+        // Hold slot state
+        const holdBox = document.getElementById('holdSlotBox');
+        const swapHint = document.getElementById('swapStatusHint');
+        if (!isEnhanced) {
+          holdBox.classList.add('disabled');
+          swapHint.textContent = 'Classic (No Hold)';
+        } else if (!state.canSwapThisTurn) {
+          holdBox.classList.add('disabled');
+          swapHint.textContent = 'Swapped This Turn';
+        } else {
+          holdBox.classList.remove('disabled');
+          swapHint.textContent = 'Hold Ready';
+        }
+
+        // Tactical abilities
+        const abilitiesCard = document.getElementById('abilitiesCard');
+        abilitiesCard.style.opacity = isEnhanced ? '1' : '0.45';
+        document.getElementById('milestoneHint').textContent = isEnhanced
+          ? `Next +1 at ${state.nextMilestone.toLocaleString()} pts`
+          : 'Disabled in Classic';
+
+        const shakeBtn = document.getElementById('shakeBtn');
+        const forkBtn = document.getElementById('forkBtn');
+        shakeBtn.disabled = !isEnhanced || state.shakeCharges <= 0 || state.fruits.length === 0;
+        forkBtn.disabled = !isEnhanced || state.forkCharges <= 0 || state.fruits.length === 0;
+
+        if (state.forkTargeting) {
+          forkBtn.classList.add('targeting');
+          document.getElementById('forkBtnTitle').textContent = 'Cancel Fork';
+          document.getElementById('forkBtnDesc').textContent = 'Click a fruit in the box now!';
+        } else {
+          forkBtn.classList.remove('targeting');
+          document.getElementById('forkBtnTitle').innerHTML = 'Fork Pop <kbd>2</kbd>';
+          document.getElementById('forkBtnDesc').textContent = 'Click a blocking fruit to remove';
+        }
+
+        renderChargePips('shakePips', isEnhanced ? state.shakeCharges : 0);
+        renderChargePips('forkPips', isEnhanced ? state.forkCharges : 0);
+      }
+
+      function applyTheme(idx) {
+        meta.themeIdx = ((idx % THEMES.length) + THEMES.length) % THEMES.length;
+        const theme = THEMES[meta.themeIdx];
+        document.documentElement.setAttribute('data-theme', theme.id);
+        document.getElementById('themeLabel').textContent = theme.name;
+        saveMeta();
+      }
+
+      /* =========================================================================
+       * 8. INPUT HANDLERS (Mouse, Touch, Keyboard, UI Buttons)
+       * ========================================================================= */
+      function getCanvasCoords(clientX, clientY) {
+        const rect = gameCanvas.getBoundingClientRect();
+        const scaleX = 440 / rect.width;
+        const scaleY = 620 / rect.height;
+        return {
+          x: (clientX - rect.left) * scaleX,
+          y: (clientY - rect.top) * scaleY
+        };
+      }
+
+      gameCanvas.addEventListener('pointermove', (e) => {
+        const pt = getCanvasCoords(e.clientX, e.clientY);
+        state.aimX = clampAimX(pt.x, state.currentTier);
+
+        if (state.forkTargeting) {
+          hoveredFruitId = null;
+          for (let i = state.fruits.length - 1; i >= 0; i--) {
+            const f = state.fruits[i];
+            if (Math.hypot(pt.x - f.x, pt.y - f.y) <= f.radius + 6) {
+              hoveredFruitId = f.id;
+              break;
+            }
+          }
+        }
+      });
+
+      gameCanvas.addEventListener('pointerdown', (e) => {
+        if (e.button === 2) {
+          // Right click swaps Hold slot
+          e.preventDefault();
+          swapHoldFruit();
+          return;
+        }
+        const pt = getCanvasCoords(e.clientX, e.clientY);
+        state.aimX = clampAimX(pt.x, state.currentTier);
+
+        if (state.forkTargeting) {
+          executeForkPopAt(pt.x, pt.y);
+          return;
+        }
+
+        // For mouse click, drop immediately; for touch, allow dragging and drop on pointerup
+        if (e.pointerType !== 'touch') {
+          dropCurrentFruit();
+        }
+      });
+
+      gameCanvas.addEventListener('pointerup', (e) => {
+        if (e.pointerType === 'touch' && !state.forkTargeting) {
+          const pt = getCanvasCoords(e.clientX, e.clientY);
+          state.aimX = clampAimX(pt.x, state.currentTier);
+          dropCurrentFruit();
+        }
+      });
+
+      gameCanvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+      window.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        switch (e.code) {
+          case 'ArrowLeft':
+          case 'KeyA':
+            keysPressed.left = true;
+            break;
+          case 'ArrowRight':
+          case 'KeyD':
+            keysPressed.right = true;
+            break;
+          case 'Space':
+          case 'Enter':
+            e.preventDefault();
+            dropCurrentFruit();
+            break;
+          case 'KeyC':
+          case 'ShiftLeft':
+          case 'ShiftRight':
+            e.preventDefault();
+            swapHoldFruit();
+            break;
+          case 'Digit1':
+            triggerShakeBox();
+            break;
+          case 'Digit2':
+            toggleForkTargeting();
+            break;
+          case 'Escape':
+            if (state.forkTargeting) {
+              state.forkTargeting = false;
+              updateUI();
+            }
+            break;
+        }
+      });
+
+      window.addEventListener('keyup', (e) => {
+        if (e.code === 'ArrowLeft' || e.code === 'KeyA') keysPressed.left = false;
+        if (e.code === 'ArrowRight' || e.code === 'KeyD') keysPressed.right = false;
+      });
+
+      // UI Button Bindings
+      document.getElementById('holdSlotBox').addEventListener('click', swapHoldFruit);
+      document.getElementById('shakeBtn').addEventListener('click', triggerShakeBox);
+      document.getElementById('forkBtn').addEventListener('click', toggleForkTargeting);
+
+      document.getElementById('modeToggleBtn').addEventListener('click', () => {
+        const nextMode = state.mode === 'enhanced' ? 'classic' : 'enhanced';
+        initNewGame(nextMode);
+      });
+
+      document.getElementById('themeBtn').addEventListener('click', () => {
+        applyTheme((meta.themeIdx || 0) + 1);
+      });
+
+      document.getElementById('musicBtn').addEventListener('click', () => {
+        const on = sound.toggleMusic();
+        const btn = document.getElementById('musicBtn');
+        btn.classList.toggle('active', on);
+        document.getElementById('musicLabel').textContent = on ? 'Music On' : 'Music Off';
+      });
+
+      document.getElementById('sfxBtn').addEventListener('click', () => {
+        sound.sfxEnabled = !sound.sfxEnabled;
+        const btn = document.getElementById('sfxBtn');
+        btn.classList.toggle('active', sound.sfxEnabled);
+        btn.classList.toggle('muted', !sound.sfxEnabled);
+        document.getElementById('sfxLabel').textContent = sound.sfxEnabled ? 'SFX On' : 'SFX Off';
+      });
+
+      document.getElementById('restartBtn').addEventListener('click', () => {
+        initNewGame(state.mode);
+      });
+
+      document.getElementById('playAgainBtn').addEventListener('click', () => {
+        document.getElementById('gameOverModal').close();
+        initNewGame(state.mode);
+      });
+
+      document.getElementById('statsBtn').addEventListener('click', () => {
+        document.getElementById('stEnhancedBest').textContent = meta.enhancedBest.toLocaleString();
+        document.getElementById('stClassicBest').textContent = meta.classicBest.toLocaleString();
+        document.getElementById('stGames').textContent = meta.gamesPlayed.toLocaleString();
+        document.getElementById('stMerges').textContent = meta.totalMerges.toLocaleString();
+        document.getElementById('stWatermelons').textContent = meta.watermelonsMade.toLocaleString();
+        document.getElementById('stDoubleSuika').textContent = meta.doubleSuikaClears.toLocaleString();
+        document.getElementById('statsModal').showModal();
+      });
+
+      document.getElementById('closeStatsBtn').addEventListener('click', () => {
+        document.getElementById('statsModal').close();
+      });
+      document.getElementById('closeStatsPrimaryBtn').addEventListener('click', () => {
+        document.getElementById('statsModal').close();
+      });
+
+      const persistAll = () => {
+        saveActiveState();
+        saveMeta();
+      };
+      window.addEventListener('beforeunload', persistAll);
+      window.addEventListener('pagehide', persistAll);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') persistAll();
+      });
+
+      // Unlock iOS Web Audio on first touch/pointer gesture
+      const unlockIOSAudio = () => {
+        sound.init();
+        if (sound.ctx) {
+          const buf = sound.ctx.createBuffer(1, 1, 22050);
+          const src = sound.ctx.createBufferSource();
+          src.buffer = buf;
+          src.connect(sound.ctx.destination);
+          if (src.start) src.start(0);
+        }
+        window.removeEventListener('touchstart', unlockIOSAudio);
+        window.removeEventListener('pointerdown', unlockIOSAudio);
+      };
+      window.addEventListener('touchstart', unlockIOSAudio, { passive: true });
+      window.addEventListener('pointerdown', unlockIOSAudio, { passive: true });
+
+      // Generate 180x180 Kawaii Watermelon Apple Touch Icon for iOS Home Screen
+      try {
+        const iconCanvas = document.createElement('canvas');
+        iconCanvas.width = 180;
+        iconCanvas.height = 180;
+        const iconCtx = iconCanvas.getContext('2d');
+        const bgGrad = iconCtx.createRadialGradient(90, 60, 10, 90, 90, 110);
+        bgGrad.addColorStop(0, '#fff6e5');
+        bgGrad.addColorStop(1, '#f7d29c');
+        iconCtx.fillStyle = bgGrad;
+        iconCtx.fillRect(0, 0, 180, 180);
+        drawFruitIllustration(iconCtx, 10, 90, 96, 66);
+        const touchLink = document.getElementById('appleTouchIcon');
+        if (touchLink) touchLink.href = iconCanvas.toDataURL('image/png');
+      } catch (e) { /* ignore icon error */ }
+
+      /* =========================================================================
+       * 9. MAIN ANIMATION LOOP & INITIALIZATION
+       * ========================================================================= */
+      loadMeta();
+      if (!tryRestoreActiveState()) {
+        initNewGame('enhanced');
+      } else {
+        updateUI();
+        renderPreviewSlots();
+        renderEvolutionWheel();
+      }
+
+      let lastTime = performance.now();
+      function loop(now) {
+        const dt = Math.min(0.033, Math.max(0.001, (now - lastTime) / 1000));
+        lastTime = now;
+
+        stepPhysics(dt);
+        renderGameCanvas();
+
+        requestAnimationFrame(loop);
+      }
+
+      window.__suikaDebug = {
+        getState: () => state,
+        getMeta: () => meta,
+        spawnFruit: (tier, x, y) => {
+          const spec = FRUITS[tier];
+          state.fruits.push({
+            id: state.nextFruitId++,
+            tier,
+            radius: spec.radius,
+            mass: spec.mass,
+            x,
+            y,
+            vx: 0,
+            vy: 0,
+            angle: 0,
+            omega: 0,
+            scaleX: 1,
+            scaleY: 1,
+            scaleVel: 0,
+            settled: true,
+            age: 2
+          });
+          meta.discovered[tier] = true;
+          renderEvolutionWheel();
+          updateUI();
+        }
+      };
+
+      requestAnimationFrame(loop);
+    })();
+  </script>
+</body>
+</html>
